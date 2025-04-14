@@ -1,0 +1,40 @@
+services:
+
+  back:
+    depends_on:
+      - mongo
+    image: talel12/e-commerce-back
+    restart: always
+    ports:
+      - 3001:3000
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://mongodb-user:mongodb-pass@mongo:27017/db-ecommerce?authSource=admin
+      - PORT=3000
+    command: ["sh", "-c", "yarn run seed:db hello@lebondeveloppeur.com admin123 && yarn start"]
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb-user
+      MONGO_INITDB_ROOT_PASSWORD: mongodb-pass
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    depends_on:
+      - mongo
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongodb-user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongodb-pass
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb-user:mongodb-pass@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+
+volumes:
+  mongo-data:

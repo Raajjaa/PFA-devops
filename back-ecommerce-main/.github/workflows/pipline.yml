@@ -1,0 +1,93 @@
+name: "workflow backend"
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    code_analysis_job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: "checkout repository"
+              uses: actions/checkout@v2
+
+            - name: "install dependencies"
+              run: npm install
+
+            - name: "run code analysis"
+              run: npm run lint
+    
+    unit_testing_job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: "checkout repository"
+              uses: actions/checkout@v2
+
+            - name: "install dependencies"
+              run: npm install
+
+            - name: Run unit tests and generate report
+              run: |
+                    mkdir -p test-reports
+                    npm test -- --json --outputFile=test-reports/test-report.json
+              continue-on-error: true 
+
+            - name: Upload test report as artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: test-report
+                path: test-reports/test-report.json
+            
+            - name: Check test results and fail if tests failed
+              run: |
+                      # Simple check using Node.js to see if the tests failed
+                      node -e "
+                      const fs = require('fs');
+                      const report = JSON.parse(fs.readFileSync('test-reports/test-report.json'));
+                        if (report.success === false || report.numFailedTests > 0) {
+                            console.error('::error::Tests failed. Stopping workflow.');
+                            process.exit(1);
+                          }
+                      "
+
+    build_and_push:
+        runs-on: ubuntu-latest
+        needs: [ "unit_testing_job", "code_analysis_job" ]
+        steps:
+            - name: "checkout repository"
+              uses: actions/checkout@v2
+
+            - name: "build Docker image"
+              run: docker build -t talel12/e-commerce-back .
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ vars.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: "push Docker image to Docker Hub"
+              run: docker push talel12/e-commerce-back
+
+            - name: "tag image"
+              run: docker tag talel12/e-commerce-back talel12/e-commerce-back:${{ github.run_number }}
+
+            - name: "push tagged image"
+              run: docker push talel12/e-commerce-back:${{ github.run_number }}
+
+    deployment_job:
+        runs-on: ubuntu-latest
+        needs: [ "build_and_push" ]
+        steps:
+            - name: "ssh access to vps and deploy"
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                host: ${{ secrets.HOST }}
+                username: user
+                password: ${{ secrets.PASSWORD }}
+                script: |
+                    cd /home/user/devops-ecommerce/back
+                    sudo git pull
+                    sudo docker compose pull
+                    sudo docker compose up -d --force-recreate --remove-orphans
