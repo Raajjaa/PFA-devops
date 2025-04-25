@@ -2,6 +2,6 @@ services:
   front-service:
     container_name: front-container
     ports:
-      - 4000:80
-    image: front-session6
+      - 3000:80
+    image: front
     build: .
