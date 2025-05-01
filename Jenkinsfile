@@ -16,8 +16,9 @@ pipeline {
             steps {
                 dir('front-ecommerce-main') {
                    bat 'npm install eslint@8.56.0 --save-dev --legacy-peer-deps'
-
                     bat 'npx eslint -f checkstyle . -o eslint-front-report.xml'
+                    bat 'npm init @eslint/config'
+
                 }
             }
         }
