@@ -15,7 +15,7 @@ pipeline {
         stage('Install & Lint Frontend') {
             steps {
                 dir('front-ecommerce-main') {
-                    bat 'npm install'
+                   bat 'npm install --legacy-peer-deps'
                     bat 'npx eslint -f checkstyle . -o eslint-front-report.xml'
                 }
             }
