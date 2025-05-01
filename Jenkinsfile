@@ -12,11 +12,45 @@ pipeline {
             }
         }
 
+        stage('Install & Lint Frontend') {
+            steps {
+                dir('front-ecommerce-main') {
+                    bat 'npm install'
+                    bat 'npx eslint -f checkstyle . -o eslint-front-report.xml'
+                }
+            }
+        }
+
+        stage('Install & Lint Backend') {
+            steps {
+                dir('back-ecommerce-main') {
+                    bat 'npm install'
+                    bat 'npx eslint -f checkstyle . -o eslint-back-report.xml'
+                }
+            }
+        }
+
+        stage('Run Frontend Tests') {
+            steps {
+                dir('front-ecommerce-main') {
+                    bat 'npm test -- --coverage'
+                }
+            }
+        }
+
+        stage('Run Backend Tests') {
+            steps {
+                dir('back-ecommerce-main') {
+                    bat 'npm test -- --coverage'
+                }
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 script {
-                    sh 'docker build -t raajjaa/front-app ./front'
-                    sh 'docker build -t raajjaa/back-app ./back'
+                    bat 'docker build -t raajjaa/front-app ./front-ecommerce-main'
+                    bat 'docker build -t raajjaa/back-app ./back-ecommerce-main'
                 }
             }
         }
@@ -24,11 +58,20 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                    sh 'docker push raajjaa/front-app'
-                    sh 'docker push raajjaa/back-app'
+                    bat "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                    bat 'docker push raajjaa/front-app'
+                    bat 'docker push raajjaa/back-app'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            recordIssues tools: [
+                checkStyle(pattern: '**/front-ecommerce-main/eslint-front-report.xml'),
+                checkStyle(pattern: '**/back-ecommerce-main/eslint-back-report.xml')
+            ]
         }
     }
 }
