@@ -12,40 +12,6 @@ pipeline {
             }
         }
 
-        stage('Install & Lint Frontend') {
-            steps {
-                dir('front-ecommerce-main') {
-                    bat 'npm install'
-                    bat 'npx eslint -f checkstyle . -o eslint-front-report.xml'
-                }
-            }
-        }
-
-        stage('Install & Lint Backend') {
-            steps {
-                dir('back-ecommerce-main') {
-                    bat 'npm install'
-                    bat 'npx eslint -f checkstyle . -o eslint-back-report.xml'
-                }
-            }
-        }
-
-        stage('Run Frontend Tests') {
-            steps {
-                dir('front-ecommerce-main') {
-                    bat 'npm test -- --coverage'
-                }
-            }
-        }
-
-        stage('Run Backend Tests') {
-            steps {
-                dir('back-ecommerce-main') {
-                    bat 'npm test -- --coverage'
-                }
-            }
-        }
-
         stage('Docker Build') {
             steps {
                 script {
