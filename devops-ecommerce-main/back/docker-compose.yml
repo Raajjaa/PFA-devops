@@ -3,10 +3,10 @@ services:
   back:
     depends_on:
       - mongo
-    image: talel12/e-commerce-back
+    image: back
     restart: always
     ports:
-      - 3001:3000
+      - 3002:3000
     env_file:
       - .env
     environment:

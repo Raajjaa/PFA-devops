@@ -68,13 +68,13 @@ jobs:
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: "push Docker image to Docker Hub"
-              run: docker push raajjaa/e-commerce-back
+              run: docker push back
 
             - name: "tag image"
-              run: docker tag raajjaa/e-commerce-back talel12/e-commerce-back:${{ github.run_number }}
+              run: docker tag back back:${{ github.run_number }}
 
             - name: "push tagged image"
-              run: docker push raajjaa/e-commerce-back:${{ github.run_number }}
+              run: docker push back:${{ github.run_number }}
 
     deployment_job:
         runs-on: ubuntu-latest
