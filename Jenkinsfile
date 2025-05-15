@@ -14,7 +14,7 @@ pipeline {
 
         stage('Install & Lint Frontend') {
             steps {
-                dir('front') {
+                dir('front-ecommerce-main') {
                     bat 'npm install'
                     bat 'npx eslint -f checkstyle . -o eslint-front-report.xml'
                 }
@@ -23,7 +23,7 @@ pipeline {
 
         stage('Install & Lint Backend') {
             steps {
-                dir('back') {
+                dir('back-ecommerce-main') {
                     bat 'npm install'
                     bat 'npx eslint -f checkstyle . -o eslint-back-report.xml'
                 }
@@ -32,16 +32,16 @@ pipeline {
 
         stage('Run Frontend Tests') {
             steps {
-                dir('front') {
-                    bat 'npm test -- --coverage'  // Exécuter les tests frontend avec couverture
+                dir('front-ecommerce-main') {
+                    bat 'npm test -- --coverage'
                 }
             }
         }
 
         stage('Run Backend Tests') {
             steps {
-                dir('back') {
-                    bat 'npm test -- --coverage'  // Exécuter les tests backend avec couverture
+                dir('back-ecommerce-main') {
+                    bat 'npm test -- --coverage'
                 }
             }
         }
@@ -49,8 +49,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    bat 'docker build -t raajjaa/front-app ./front'
-                    bat 'docker build -t raajjaa/back-app ./back'
+                    bat 'docker build -t raajjaa/front-app ./front-ecommerce-main'
+                    bat 'docker build -t raajjaa/back-app ./back-ecommerce-main'
                 }
             }
         }
@@ -68,10 +68,9 @@ pipeline {
 
     post {
         always {
-            // Enregistrer les problèmes ESLint
             recordIssues tools: [
-                checkStyle(pattern: '**/front/eslint-front-report.xml'),
-                checkStyle(pattern: '**/back/eslint-back-report.xml')
+                checkStyle(pattern: '**/front-ecommerce-main/eslint-front-report.xml'),
+                checkStyle(pattern: '**/back-ecommerce-main/eslint-back-report.xml')
             ]
         }
     }

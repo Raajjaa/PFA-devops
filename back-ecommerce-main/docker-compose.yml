@@ -3,20 +3,20 @@ services:
   back:
     depends_on:
       - mongo
-    image: back-session6
+    image: back
     restart: always
     ports:
-      - 3000:3000
+      - 3002:3000
     build: .
     env_file:
-     - .env
+      - .env
     environment:
       - MONGO_URI=mongodb://mongodb-user:mongodb-pass@mongo:27017/db-ecommerce?authSource=admin
       - PORT=3000
     command: ["sh", "-c", "yarn run seed:db hello@lebondeveloppeur.com admin123 && yarn start"]
 
-  mongo-service:
-    image: mongo
+  mongo: 
+    image: mongo:4.4
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongodb-user

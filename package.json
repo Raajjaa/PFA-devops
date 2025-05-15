@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "eslint": "^9.25.1",
+    "eslint-formatter-checkstyle": "^8.40.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.0.0"
+  },
+  "scripts": {
+    "lint": "eslint -f checkstyle . > eslint-report.xml"
+  },
+  "dependencies": {
+    "@testing-library/react": "^13.4.0"
+  }
+}

@@ -28,17 +28,19 @@ router.get("/health", async (req, res) => {
         message: "App is running smoothly...",
         database: "Connected",
       });
-    } catch (err) {
-      res.status(500).json({
-        status: "DOWN",
-        message: "App or Database is experiencing issues...",
-        database: "Disconnected",
-      });
     }
+    // eslint-disable-next-line no-unused-vars
+catch (err) {
+  res.status(500).json({
+    status: "DOWN",
+    message: "App or Database is experiencing issues...",
+    database: "Disconnected",
   });
-  
+}
+  });
 
-  
+
+
 // api routes
 router.use(api, apiRoutes);
 router.use(api, (req, res) => res.status(404).json('No API route found'));
