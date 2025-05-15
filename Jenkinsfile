@@ -15,8 +15,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    bat 'docker build -t raajjaa/front-app ./front-ecommerce-main'
-                    bat 'docker build -t raajjaa/back-app ./back-ecommerce-main'
+                    bat 'docker build -t front ./front-ecommerce-main'
+                    bat 'docker build -t /back ./back-ecommerce-main'
                 }
             }
         }
@@ -25,8 +25,8 @@ pipeline {
             steps {
                 script {
                     bat "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                    bat 'docker push raajjaa/front-app'
-                    bat 'docker push raajjaa/back-app'
+                    bat 'docker push front'
+                    bat 'docker push back'
                 }
             }
         }
